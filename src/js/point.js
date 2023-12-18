@@ -3,12 +3,13 @@ export default class Point {
         this.x = x;
         this.y = y;
         
-        console.log(`Created point (${this.x}, ${this.y})`);
+        console.log(`Created point (${this.x}; ${this.y})`);
     }
 
-    draw(ctx, radius = 9, color = '#000000de') {
+    draw(ctx, radius = 8, color = '#959595') {
         ctx.beginPath();
         ctx.arc(this.x, this.y, radius, 0, 2 * Math.PI);
+        ctx.strokeStyle = color;
         ctx.fillStyle = color;
         ctx.fill();
         ctx.stroke();
