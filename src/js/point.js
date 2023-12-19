@@ -3,7 +3,11 @@ export default class Point {
         this.x = x;
         this.y = y;
         
-        console.log(`Created point (${this.x}; ${this.y})`);
+        // console.log(`Created point (${this.x}; ${this.y})`);
+    }
+
+    equals(point) {
+        return point.x == this.x && this.y == point.y;
     }
 
     draw(ctx, radius = 8, color = '#959595') {

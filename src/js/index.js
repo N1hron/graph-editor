@@ -1,8 +1,15 @@
 import Point from './point.js';
 import Segment from './segment.js';
 import Graph from './graph.js';
+import getRandomIntInclusive from './getRandomIntInclusive.js';
 
 const canvas = document.getElementById('canvas');
+
+const addRandomPointBtn = document.querySelector('[data-action="add-rnd-point"]'),
+      addRandomSegmentBtn = document.querySelector('[data-action="add-rnd-segment"]'),
+      removeRandomPointBtn = document.querySelector('[data-action="remove-rnd-point"]'),
+      removeRandomSegmentBtn = document.querySelector('[data-action="remove-rnd-segment"]'),
+      removeAllBtn = document.querySelector('[data-action="remove-all"]');
 
 canvas.width = 600;
 canvas.height = 600;
@@ -21,3 +28,58 @@ const s1 = new Segment(p1, p2),
 const graph = new Graph([ p1, p2, p3, p4 ], [ s1, s2, s3 ]);
 
 graph.draw(ctx);
+
+addRandomPointBtn.addEventListener('click', addRandomPoint);
+addRandomSegmentBtn.addEventListener('click', addRandomSegment);
+removeRandomPointBtn.addEventListener('click', removeRandomPoint);
+removeRandomSegmentBtn.addEventListener('click', removeRandomSegment);
+removeAllBtn.addEventListener('click', removeAll);
+
+function removeAll() {
+    graph.removeAll(ctx);
+}
+
+function addRandomPoint() {
+    const x = getRandomIntInclusive(0, canvas.width),
+          y = getRandomIntInclusive(0, canvas.height);
+
+    const pointAdded = graph.addPoint(new Point(x, y));
+
+    if (pointAdded) graph.redraw(ctx);
+}
+
+function addRandomSegment() {
+    if (graph.hasAnyPoints()) {
+        const pointIndex1 = getRandomIntInclusive(0, graph.points.length - 1),
+          pointIndex2 = getRandomIntInclusive(0, graph.points.length - 1);
+
+        const segmentAdded = graph.addSegment(
+            new Segment(
+                graph.points[pointIndex1], 
+                graph.points[pointIndex2]
+            )
+        );
+
+        if (segmentAdded) graph.redraw(ctx);
+    }
+}
+
+function removeRandomPoint() {
+    if (graph.hasAnyPoints()) {
+        const index = getRandomIntInclusive(0, graph.points.length - 1);
+
+        graph.removePoint(graph.points[index]);
+
+        graph.redraw(ctx);
+    }
+}
+
+function removeRandomSegment() {
+    if (graph.hasAnySegments()) {
+        const index = getRandomIntInclusive(0, graph.segments.length - 1);
+
+        graph.removeSegment(graph.segments[index]);
+
+        graph.redraw(ctx);
+    }
+}
