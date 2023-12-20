@@ -16,13 +16,9 @@ export default class Graph {
         this.draw(ctx);
     }
 
-    removeAll(ctx) {
-        const { canvas } = ctx;
-
+    removeAll() {
         this.points.length = 0;
         this.segments.length = 0;
-    
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
     addPoint(point) {

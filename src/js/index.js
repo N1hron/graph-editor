@@ -1,6 +1,7 @@
 import Point from './point.js';
 import Segment from './segment.js';
 import Graph from './graph.js';
+import GraphEditor from './graphEditor.js';
 import getRandomIntInclusive from './getRandomIntInclusive.js';
 
 const canvas = document.getElementById('canvas');
@@ -14,7 +15,7 @@ const addRandomPointBtn = document.querySelector('[data-action="add-rnd-point"]'
 canvas.width = 600;
 canvas.height = 600;
 
-const ctx = canvas.getContext('2d');
+// const ctx = canvas.getContext('2d');
 
 const p1 = new Point(20, 20),
       p2 = new Point(580, 580),
@@ -27,7 +28,9 @@ const s1 = new Segment(p1, p2),
 
 const graph = new Graph([ p1, p2, p3, p4 ], [ s1, s2, s3 ]);
 
-graph.draw(ctx);
+const graphEditor = new GraphEditor(canvas, graph);
+
+graphEditor.init();
 
 addRandomPointBtn.addEventListener('click', addRandomPoint);
 addRandomSegmentBtn.addEventListener('click', addRandomSegment);
@@ -36,7 +39,8 @@ removeRandomSegmentBtn.addEventListener('click', removeRandomSegment);
 removeAllBtn.addEventListener('click', removeAll);
 
 function removeAll() {
-    graph.removeAll(ctx);
+    graph.removeAll();
+    graphEditor.selectedPoint = null;
 }
 
 function addRandomPoint() {
@@ -45,7 +49,7 @@ function addRandomPoint() {
 
     const pointAdded = graph.addPoint(new Point(x, y));
 
-    if (pointAdded) graph.redraw(ctx);
+    // if (pointAdded) graph.redraw(ctx);
 }
 
 function addRandomSegment() {
@@ -60,7 +64,7 @@ function addRandomSegment() {
             )
         );
 
-        if (segmentAdded) graph.redraw(ctx);
+        // if (segmentAdded) graph.redraw(ctx);
     }
 }
 
@@ -70,7 +74,7 @@ function removeRandomPoint() {
 
         graph.removePoint(graph.points[index]);
 
-        graph.redraw(ctx);
+        // graph.redraw(ctx);
     }
 }
 
@@ -80,6 +84,6 @@ function removeRandomSegment() {
 
         graph.removeSegment(graph.segments[index]);
 
-        graph.redraw(ctx);
+        // graph.redraw(ctx);
     }
 }
