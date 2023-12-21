@@ -2,7 +2,7 @@ import Point from './point.js';
 import Segment from './segment.js';
 import Graph from './graph.js';
 import GraphEditor from './graphEditor.js';
-import getRandomIntInclusive from './getRandomIntInclusive.js';
+import getRandomIntInclusive from './utils/getRandomIntInclusive.js';
 
 const canvas = document.getElementById('canvas');
 
