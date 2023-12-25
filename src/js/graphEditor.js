@@ -9,17 +9,26 @@ export default class GraphEditor {
 
         this.ctx = canvas.getContext('2d');
 
+        this.mouseLocation = null;
         this.selectedPoint = null;
         this.hoveredPoint = null;
-
+        
         this.dragging = false;
     }
-
-    #boundAnimate = this.#animate.bind(this);
 
     init() {
         this.#addEventListeners();
         this.#animate();
+    }
+
+    #animate() {
+        this.graph.redraw(this.ctx);
+        
+        this.#drawSegmentIntent();
+        this.#drawPointSelection();
+        this.#drawPointHover();
+
+        requestAnimationFrame(() => this.#animate());
     }
 
     #addEventListeners() {
@@ -28,15 +37,6 @@ export default class GraphEditor {
         this.canvas.addEventListener('mouseup', () => this.dragging = false);
         this.canvas.addEventListener('mouseleave', () => this.hoveredPoint = null);
         this.canvas.addEventListener('contextmenu', event => event.preventDefault());
-    }
-
-    #animate() {
-        this.graph.redraw(this.ctx);
-        
-        this.#drawPointSelection();
-        this.#drawPointHover();
-
-        requestAnimationFrame(this.#boundAnimate);
     }
 
     #drawPointSelection() {
@@ -51,23 +51,35 @@ export default class GraphEditor {
         }
     }
 
+    #drawSegmentIntent() {
+        if (this.selectedPoint) {
+            new Segment(
+                this.selectedPoint, 
+                this.hoveredPoint || this.mouseLocation
+            ).draw(this.ctx, { dash: [5, 5] });
+        }
+    }
+
     #handleMouseDown(event) {
         const button = event.button;
 
         switch (button) {
-            case 0: // Left click
-                this.#selectOrCreatePoint(event);
+            case 0:
+                this.#handleLeftClick(event);
                 break;
-            case 2: // Right click
-                this.#removeHoveredPoint();
+            case 2:
+                this.#handleRightClick();
                 break;
         }
     }
 
     #handleMouseMove(event) {
-        const [x, y] = [event.offsetX, event.offsetY];
+        this.mouseLocation = {
+            x: event.offsetX,
+            y: event.offsetY
+        };
 
-        this.hoveredPoint = getNearestPoint({x, y}, this.graph.points, 10);
+        this.hoveredPoint = getNearestPoint(this.mouseLocation, this.graph.points, 10);
 
         if (this.dragging) {
             this.selectedPoint.x = event.offsetX;
@@ -75,29 +87,11 @@ export default class GraphEditor {
         }
     }
 
-    #removeHoveredPoint() {
-        if (this.hoveredPoint) {
-            this.graph.removePoint(this.hoveredPoint);
-            if (this.hoveredPoint === this.selectedPoint) this.selectedPoint = null;
-            this.hoveredPoint = null;
-        }
-        
-    }
-
-    #selectOrCreatePoint(event) {
+    #handleLeftClick(event) {
         let previouslySelectedPoint = this.selectedPoint;
 
-        if (this.hoveredPoint) {
-            this.selectedPoint = this.hoveredPoint;
-            this.dragging = true;
-        } else {
-            const newPoint = new Point(event.offsetX, event.offsetY);
-
-            this.selectedPoint = newPoint;
-            this.hoveredPoint = this.selectedPoint;
-
-            this.graph.addPoint(newPoint);
-        }
+        if (this.hoveredPoint) this.#selectHoveredPoint();
+        else this.#createPoint(new Point(event.offsetX, event.offsetY));
 
         if (previouslySelectedPoint) {
             this.graph.addSegment(new Segment(
@@ -105,5 +99,28 @@ export default class GraphEditor {
                 this.selectedPoint
             ));
         }
+    }
+
+    #handleRightClick() {
+        if (this.selectedPoint) this.selectedPoint = null;
+        else if (this.hoveredPoint) this.#removeHoveredPoint();
+    }
+
+    #removeHoveredPoint() {
+        this.graph.removePoint(this.hoveredPoint);
+        if (this.hoveredPoint === this.selectedPoint) this.selectedPoint = null;
+        this.hoveredPoint = null;
+    }
+
+    #selectHoveredPoint() {
+        this.selectedPoint = this.hoveredPoint;
+        this.dragging = true;
+    }
+
+    #createPoint(newPoint) {
+        this.selectedPoint = newPoint;
+        this.hoveredPoint = this.selectedPoint;
+
+        this.graph.addPoint(newPoint);
     }
 }

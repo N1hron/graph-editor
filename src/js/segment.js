@@ -4,12 +4,13 @@ export default class Segment {
         this.p2 = p2;
     }
 
-    draw(ctx, width = 2, color = '#959595') {
+    draw(ctx, { width = 2, color = '#959595', dash = [] } = {}) {
         const { x: x1, y: y1 } = this.p1,
               { x: x2, y: y2 } = this.p2;
 
         ctx.beginPath();
 
+        ctx.setLineDash(dash);
         ctx.lineWidth = width;
         ctx.strokeStyle = color;
 
